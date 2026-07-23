@@ -106,13 +106,11 @@
       padding:0 22px; gap:0;
       max-height:0; opacity:0; overflow:hidden; visibility:hidden;
       box-shadow:0 16px 32px rgba(11,27,51,0.16);
-      transition:max-height .28s ease, opacity .2s ease, visibility 0s linear .28s;
     }
     #menu-toggle:checked ~ nav.links{
       max-height:min(85vh, 600px); opacity:1; overflow-y:auto; visibility:visible;
       padding:12px 22px calc(16px + env(safe-area-inset-bottom));
       border-top:1px solid var(--line);
-      transition:max-height .28s ease, opacity .2s ease;
     }
     .burger{display:flex;}
     nav.links a{padding:11px 4px; width:100%; font-size:0.98rem; border-bottom:1px solid var(--line);}
@@ -121,6 +119,16 @@
   @media(max-width:400px){
     .brand-text{font-size:0.92rem;}
     .brand img{height:44px;}
+  }
+
+  /* ---------- Fond bloquant le contenu derrière le menu mobile ---------- */
+  #nav-backdrop{display:none;}
+  @media(max-width:980px){
+    #nav-backdrop{
+      display:none; position:fixed; inset:0; z-index:99;
+      background:rgba(11,27,51,0.45);
+    }
+    #nav-backdrop.show{display:block;}
   }
 
   /* ---------- Hero ---------- */
@@ -588,6 +596,8 @@
     </nav>
   </div>
 </header>
+
+<div id="nav-backdrop"></div>
 
 <div id="top" class="hero">
   <div class="hero-slides">
@@ -1259,10 +1269,36 @@
 (function(){
   var menuToggle = document.getElementById('menu-toggle');
   var navLinks = document.querySelector('nav.links');
+  var navBackdrop = document.getElementById('nav-backdrop');
+
+  function lockBodyScroll(lock){
+    if (lock){
+      var scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      document.body.style.paddingRight = scrollbarWidth + 'px';
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.paddingRight = '';
+    }
+  }
 
   function closeMenu(){
     menuToggle.checked = false;
+    navBackdrop.classList.remove('show');
+    lockBodyScroll(false);
   }
+
+  menuToggle.addEventListener('change', function(){
+    if (menuToggle.checked){
+      navBackdrop.classList.add('show');
+      lockBodyScroll(true);
+    } else {
+      navBackdrop.classList.remove('show');
+      lockBodyScroll(false);
+    }
+  });
+
+  navBackdrop.addEventListener('click', closeMenu);
 
   navLinks.querySelectorAll('a').forEach(function(a){
     a.addEventListener('click', function(){ closeMenu(); });
