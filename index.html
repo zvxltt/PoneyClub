@@ -8,6 +8,8 @@
 <meta name="description" content="Centre équestre dans un cadre boisé, ambiance familiale, dès 2 ans jusqu'à la compétition. Cours, stages, pensions, baptêmes poney à Ozouer-le-Voulgis.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://sp-ao.shortpixel.ai" crossorigin>
+<link rel="preload" as="image" fetchpriority="high" href="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_1600/https://poneyclubduvoulgis.com/wp-content/uploads/2025/07/Equitation-douce-et-personnalisee2.png">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -25,7 +27,7 @@
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   html{scroll-behavior:smooth;}
-  html, body{overflow-x:hidden; max-width:100%;}
+  body{overflow-x:hidden; max-width:100%;}
   body{
     font-family:'Work Sans', sans-serif;
     background:var(--cream-light);
@@ -36,6 +38,8 @@
     -webkit-text-size-adjust:100%;
   }
   img{max-width:100%; display:block;}
+  .fade-img{opacity:0; transition:opacity .45s ease;}
+  .fade-img.is-loaded, .fade-img[loading="eager"]{opacity:1;}
   a{color:inherit; text-decoration:none;}
   h1,h2,h3,h4{font-family:'Fraunces', serif; font-weight:600; letter-spacing:-0.01em; color:var(--forest-dark);}
   .eyebrow{
@@ -47,26 +51,32 @@
     color:var(--brass);
   }
   .wrap{max-width:1180px; margin:0 auto; padding:0 28px;}
-  section{padding:96px 0;}
+  section{padding:96px 0; scroll-margin-top:86px;}
+  #top{scroll-margin-top:0;}
   @media(max-width:720px){ section{padding:64px 0;} }
   @media(max-width:480px){
     section{padding:52px 0;}
     .wrap{padding:0 20px;}
   }
+  @media(max-width:980px){
+    section{scroll-margin-top:70px;}
+  }
 
   /* ---------- Header ---------- */
   header{
-    position:sticky; top:0; z-index:50;
+    position:sticky; top:0; z-index:100;
     background:rgba(250,246,245,0.92);
     backdrop-filter:blur(8px);
     border-bottom:1px solid var(--line);
+    transition:transform .28s ease;
   }
+  header.header-hidden{transform:translateY(-100%);}
   .nav{
     max-width:1180px; margin:0 auto; padding:14px 28px;
     display:flex; align-items:center; justify-content:space-between;
     gap:24px;
   }
-  .brand{display:flex; align-items:center; gap:12px;}
+  .brand{display:flex; align-items:center; gap:12px; position:relative; z-index:2;}
   .brand img{height:52px; width:auto;}
   .brand-text{font-family:'Fraunces', serif; font-size:1.05rem; line-height:1.15; color:var(--forest-dark);}
   .brand-text small{display:block; font-family:'Work Sans',sans-serif; font-size:0.68rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--brass); font-weight:600; margin-top:3px;}
@@ -79,23 +89,38 @@
     text-transform:uppercase; white-space:nowrap;
   }
   .nav-cta:hover{background:var(--forest-light); color:var(--white)!important;}
+  .mobile-quick-actions{display:none;}
   #menu-toggle{display:none;}
   .burger{
     display:none; cursor:pointer; font-size:1.5rem; color:var(--forest-dark);
     background:none; border:none; width:44px; height:44px; align-items:center; justify-content:center;
+    position:relative; z-index:2;
   }
+  .burger .burger-close{display:none;}
+  #menu-toggle:checked + .burger .burger-open{display:none;}
+  #menu-toggle:checked + .burger .burger-close{display:inline;}
   @media(max-width:980px){
-    .nav{padding:12px 20px;}
+    .nav{padding:12px 20px; position:relative; z-index:2;}
     nav.links{
-      display:none; position:absolute; top:100%; left:0; right:0;
-      background:var(--cream-light); flex-direction:column; align-items:flex-start;
-      padding:20px 20px calc(28px + env(safe-area-inset-bottom)); border-bottom:1px solid var(--line); gap:4px;
-      max-height:calc(100vh - 70px); overflow-y:auto;
+      display:none; position:fixed; inset:0; z-index:1;
+      background:var(--cream-light); flex-direction:column; align-items:stretch; justify-content:flex-start;
+      padding:calc(78px + env(safe-area-inset-top)) 24px calc(28px + env(safe-area-inset-bottom));
+      gap:2px; overflow-y:auto;
     }
     #menu-toggle:checked ~ nav.links{display:flex;}
     .burger{display:flex;}
-    nav.links a{padding:10px 0; width:100%;}
-    nav.links a.nav-cta{margin-top:10px; text-align:center;}
+    nav.links a{padding:16px 4px; width:100%; font-size:1.08rem; border-bottom:1px solid var(--line);}
+    nav.links a.nav-cta{margin-top:18px; text-align:center; border-bottom:none; padding:15px 22px;}
+    .mobile-quick-actions{
+      display:grid; grid-template-columns:1fr 1fr; gap:10px; width:100%; margin-bottom:18px;
+    }
+    .quick-action-btn{
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      background:var(--white); border:1px solid var(--line); border-radius:8px;
+      padding:14px 10px; font-size:0.86rem; font-weight:600; color:var(--forest-dark);
+    }
+    .quick-action-btn svg{width:18px; height:18px; color:var(--brass); flex-shrink:0;}
+    .quick-action-btn:active{background:var(--cream);}
   }
   @media(max-width:400px){
     .brand-text{font-size:0.92rem;}
@@ -321,10 +346,16 @@
   #chat-toggle .ping{
     position:absolute; top:-3px; right:-3px; width:14px; height:14px; border-radius:50%;
     background:var(--brass); border:2px solid var(--cream-light);
+    animation:pingPulse 2.2s ease-in-out infinite;
+  }
+  #chatbot.seen #chat-toggle .ping{display:none;}
+  @keyframes pingPulse{
+    0%, 100%{transform:scale(1); box-shadow:0 0 0 0 rgba(226,19,126,0.4);}
+    50%{transform:scale(1.15); box-shadow:0 0 0 5px rgba(226,19,126,0);}
   }
   #chat-window{
-    position:absolute; left:0; bottom:76px; width:340px; max-width:calc(100vw - 48px);
-    height:460px; max-height:70vh;
+    position:absolute; left:0; bottom:76px; width:368px; max-width:calc(100vw - 48px);
+    height:500px; max-height:72vh;
     background:var(--white); border:1px solid var(--line); border-radius:6px;
     box-shadow:0 20px 60px rgba(11,27,51,0.28);
     display:flex; flex-direction:column; overflow:hidden;
@@ -339,10 +370,17 @@
     display:flex; align-items:center; gap:12px;
   }
   .chat-head img{width:36px; height:36px; border-radius:50%; background:var(--cream-light); object-fit:contain; padding:3px;}
-  .chat-head .ch-text{line-height:1.25;}
+  .chat-head .ch-text{line-height:1.25; flex:1;}
   .chat-head strong{font-family:'Fraunces',serif; font-size:0.98rem; font-weight:600;}
   .chat-head span{display:block; font-size:0.72rem; color:var(--brass-light);}
   .chat-head span::before{content:'● '; color:#8fd6a8; font-size:0.6rem;}
+  .chat-call-btn{
+    width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.12);
+    display:flex; align-items:center; justify-content:center; color:var(--white); flex-shrink:0;
+    transition:background .15s ease;
+  }
+  .chat-call-btn svg{width:16px; height:16px;}
+  .chat-call-btn:hover{background:var(--brass);}
   #chat-body{
     flex:1; overflow-y:auto; padding:18px; display:flex; flex-direction:column; gap:12px;
     background:var(--cream-light);
@@ -393,6 +431,23 @@
     #chat-toggle{width:54px; height:54px;}
   }
 
+  /* ---------- Retour en haut ---------- */
+  #back-to-top{
+    position:fixed; right:24px; right:calc(24px + env(safe-area-inset-right));
+    bottom:24px; bottom:calc(24px + env(safe-area-inset-bottom));
+    width:48px; height:48px; border-radius:50%; border:1px solid var(--line);
+    background:var(--white); color:var(--forest-dark); cursor:pointer; z-index:190;
+    display:flex; align-items:center; justify-content:center; box-shadow:0 8px 20px rgba(11,27,51,0.18);
+    opacity:0; transform:translateY(10px); pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease;
+  }
+  #back-to-top.show{opacity:1; transform:translateY(0); pointer-events:auto;}
+  #back-to-top svg{width:18px; height:18px;}
+  #back-to-top:hover{background:var(--forest); color:var(--white); border-color:var(--forest);}
+  @media(max-width:480px){
+    #back-to-top{width:42px; height:42px; right:calc(14px + env(safe-area-inset-right)); bottom:calc(78px + env(safe-area-inset-bottom));}
+  }
+
   /* ---------- Modales internes ---------- */
   .modal-overlay{
     position:fixed; inset:0; background:rgba(11,27,51,0.6); backdrop-filter:blur(3px);
@@ -412,7 +467,7 @@
   .modal-inner li{margin-bottom:6px;}
   .modal-inner strong{color:var(--forest-dark);}
   .modal-close{
-    position:absolute; top:16px; right:16px; width:36px; height:36px; border-radius:50%;
+    position:absolute; top:14px; right:14px; width:40px; height:40px; border-radius:50%;
     background:var(--white); border:1px solid var(--line); cursor:pointer; font-size:1.1rem;
     display:flex; align-items:center; justify-content:center; color:var(--forest-dark); z-index:2;
   }
@@ -517,12 +572,22 @@
 <header>
   <div class="nav">
     <a href="#top" class="brand">
-      <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img/https://poneyclubduvoulgis.com/wp-content/uploads/2018/08/test2-150.png" alt="Poney Club du Voulgis">
+      <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img/https://poneyclubduvoulgis.com/wp-content/uploads/2018/08/test2-150.png" alt="Poney Club du Voulgis" decoding="async" fetchpriority="high">
       <span class="brand-text">Poney Club<br>du Voulgis<small>Ozouer-le-Voulgis · 77</small></span>
     </a>
     <input type="checkbox" id="menu-toggle">
-    <label for="menu-toggle" class="burger">☰</label>
+    <label for="menu-toggle" class="burger"><span class="burger-open">☰</span><span class="burger-close">✕</span></label>
     <nav class="links">
+      <div class="mobile-quick-actions">
+        <a href="tel:+33164076263" class="quick-action-btn">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.4 0 .8-.2 1L6.6 10.8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+          Appeler
+        </a>
+        <a href="https://www.google.com/maps?q=Rue+de+Jamard,+77390+Ozouer-le-Voulgis" target="_blank" rel="noopener" class="quick-action-btn">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 21s7-6.3 7-11.5A7 7 0 0 0 5 9.5C5 14.7 12 21 12 21Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="12" cy="9.5" r="2.4" stroke="currentColor" stroke-width="1.7"/></svg>
+          Itinéraire
+        </a>
+      </div>
       <a href="#club">Le club</a>
       <a href="#parcours">Les cours</a>
       <a href="#activites">Activités</a>
@@ -541,10 +606,10 @@
 <div id="top" class="hero">
   <div class="hero-slides">
     <div class="hero-slide" style="background-image:url('https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_1600/https://poneyclubduvoulgis.com/wp-content/uploads/2025/07/Equitation-douce-et-personnalisee2.png');"></div>
-    <div class="hero-slide" style="background-image:url('https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_1600/https://poneyclubduvoulgis.com/wp-content/uploads/2025/07/Dans-une-ambiance-familiale.png');"></div>
-    <div class="hero-slide" style="background-image:url('https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_1600/https://poneyclubduvoulgis.com/wp-content/uploads/2025/07/Des-2-ans-et-jusqua-la-competition.png');"></div>
-    <div class="hero-slide" style="background-image:url('https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_1600/https://poneyclubduvoulgis.com/wp-content/uploads/2025/07/A-votre-ecoute-et-celle-de-votre-cheval.png');"></div>
-    <div class="hero-slide" style="background-image:url('https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_1600/https://poneyclubduvoulgis.com/wp-content/uploads/2025/07/Bien-etre.png');"></div>
+    <div class="hero-slide" data-bg="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_1600/https://poneyclubduvoulgis.com/wp-content/uploads/2025/07/Dans-une-ambiance-familiale.png"></div>
+    <div class="hero-slide" data-bg="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_1600/https://poneyclubduvoulgis.com/wp-content/uploads/2025/07/Des-2-ans-et-jusqua-la-competition.png"></div>
+    <div class="hero-slide" data-bg="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_1600/https://poneyclubduvoulgis.com/wp-content/uploads/2025/07/A-votre-ecoute-et-celle-de-votre-cheval.png"></div>
+    <div class="hero-slide" data-bg="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_1600/https://poneyclubduvoulgis.com/wp-content/uploads/2025/07/Bien-etre.png"></div>
   </div>
   <div class="hero-content">
     <span class="eyebrow">Centre équestre — Ozouer-le-Voulgis, Seine-et-Marne</span>
@@ -570,7 +635,7 @@
     </div>
     <div class="intro-figure">
       <div class="frame"></div>
-      <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_800,h_800/https://poneyclubduvoulgis.com/wp-content/uploads/2020/06/entree.jpg" alt="Entrée du Poney Club du Voulgis">
+      <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_800,h_800/https://poneyclubduvoulgis.com/wp-content/uploads/2020/06/entree.jpg" alt="Entrée du Poney Club du Voulgis" loading="lazy" decoding="async" class="fade-img">
     </div>
   </div>
 </section>
@@ -671,35 +736,35 @@
     </div>
     <div class="gallery-grid">
       <div class="gallery-item">
-        <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_600,h_750/https://poneyclubduvoulgis.com/wp-content/uploads/2023/08/grand-manege-1.jpg" alt="Grand manège 20x40">
+        <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_600,h_750/https://poneyclubduvoulgis.com/wp-content/uploads/2023/08/grand-manege-1.jpg" alt="Grand manège 20x40" loading="lazy" decoding="async" class="fade-img">
         <div class="cap">Grand manège 20×40</div>
       </div>
       <div class="gallery-item">
-        <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_600,h_750/https://poneyclubduvoulgis.com/wp-content/uploads/2025/07/carriere.jpg" alt="Carrière 35x80">
+        <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_600,h_750/https://poneyclubduvoulgis.com/wp-content/uploads/2025/07/carriere.jpg" alt="Carrière 35x80" loading="lazy" decoding="async" class="fade-img">
         <div class="cap">Carrière 35×80</div>
       </div>
       <div class="gallery-item">
-        <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_600,h_750/https://poneyclubduvoulgis.com/wp-content/uploads/2020/06/le-manege.jpg" alt="Petit manège">
+        <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_600,h_750/https://poneyclubduvoulgis.com/wp-content/uploads/2020/06/le-manege.jpg" alt="Petit manège" loading="lazy" decoding="async" class="fade-img">
         <div class="cap">Petit manège</div>
       </div>
       <div class="gallery-item">
-        <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_600,h_750/https://poneyclubduvoulgis.com/wp-content/uploads/2020/06/le-rond-de-longe.jpg" alt="Marcheur">
+        <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_600,h_750/https://poneyclubduvoulgis.com/wp-content/uploads/2020/06/le-rond-de-longe.jpg" alt="Marcheur" loading="lazy" decoding="async" class="fade-img">
         <div class="cap">Le marcheur</div>
       </div>
       <div class="gallery-item">
-        <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_600,h_750/https://poneyclubduvoulgis.com/wp-content/uploads/2020/06/la-cours.jpg" alt="Cour extérieure">
+        <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_600,h_750/https://poneyclubduvoulgis.com/wp-content/uploads/2020/06/la-cours.jpg" alt="Cour extérieure" loading="lazy" decoding="async" class="fade-img">
         <div class="cap">La cour extérieure</div>
       </div>
       <div class="gallery-item">
-        <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_600,h_750/https://poneyclubduvoulgis.com/wp-content/uploads/2020/06/les-shetlands.jpg" alt="Stabulations shetlands">
+        <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_600,h_750/https://poneyclubduvoulgis.com/wp-content/uploads/2020/06/les-shetlands.jpg" alt="Stabulations shetlands" loading="lazy" decoding="async" class="fade-img">
         <div class="cap">Stabulations shetlands</div>
       </div>
       <div class="gallery-item">
-        <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_600,h_750/https://poneyclubduvoulgis.com/wp-content/uploads/2023/08/IMG-20220401-WA0004.jpg" alt="Barns propriétaires">
+        <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_600,h_750/https://poneyclubduvoulgis.com/wp-content/uploads/2023/08/IMG-20220401-WA0004.jpg" alt="Barns propriétaires" loading="lazy" decoding="async" class="fade-img">
         <div class="cap">Le barn propriétaires</div>
       </div>
       <div class="gallery-item">
-        <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_600,h_750/https://poneyclubduvoulgis.com/wp-content/uploads/2020/06/entree.jpg" alt="Entrée du club">
+        <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_600,h_750/https://poneyclubduvoulgis.com/wp-content/uploads/2020/06/entree.jpg" alt="Entrée du club" loading="lazy" decoding="async" class="fade-img">
         <div class="cap">L'entrée</div>
       </div>
     </div>
@@ -715,32 +780,32 @@
     </div>
     <div class="team-grid">
       <div class="team-card">
-        <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_350,h_467/https://poneyclubduvoulgis.com/wp-content/uploads/2017/12/boss.jpg" alt="Renaud Vermes">
+        <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_350,h_467/https://poneyclubduvoulgis.com/wp-content/uploads/2017/12/boss.jpg" alt="Renaud Vermes" loading="lazy" decoding="async" class="fade-img">
         <h4>Renaud Vermes</h4>
         <p>Directeur des structures, RV Équitation et Poney Club de Mareuil</p>
       </div>
       <div class="team-card">
-        <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_350,h_467/https://poneyclubduvoulgis.com/wp-content/uploads/2020/06/rv-equitation-anais-cheron.png" alt="Anaïs">
+        <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_350,h_467/https://poneyclubduvoulgis.com/wp-content/uploads/2020/06/rv-equitation-anais-cheron.png" alt="Anaïs" loading="lazy" decoding="async" class="fade-img">
         <h4>Anaïs</h4>
         <p>Monitrice tous niveaux, orientée CSO, Equifun</p>
       </div>
       <div class="team-card">
-        <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_350,h_467/https://poneyclubduvoulgis.com/wp-content/uploads/2020/06/rv-equitation-maxime-nourygat.png" alt="Maxime Nourygat">
+        <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_350,h_467/https://poneyclubduvoulgis.com/wp-content/uploads/2020/06/rv-equitation-maxime-nourygat.png" alt="Maxime Nourygat" loading="lazy" decoding="async" class="fade-img">
         <h4>Maxime Nourygat</h4>
         <p>Moniteur tous niveaux, orienté Hunter — communication</p>
       </div>
       <div class="team-card">
-        <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_350,h_467/https://poneyclubduvoulgis.com/wp-content/uploads/2026/07/emma.jpeg" alt="Emma">
+        <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_350,h_467/https://poneyclubduvoulgis.com/wp-content/uploads/2026/07/emma.jpeg" alt="Emma" loading="lazy" decoding="async" class="fade-img">
         <h4>Emma</h4>
         <p>Animatrice d'équitation, en formation BPJEPS</p>
       </div>
       <div class="team-card">
-        <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_350,h_467/https://poneyclubduvoulgis.com/wp-content/uploads/2026/07/coralie.jpg" alt="Coralie">
+        <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_350,h_467/https://poneyclubduvoulgis.com/wp-content/uploads/2026/07/coralie.jpg" alt="Coralie" loading="lazy" decoding="async" class="fade-img">
         <h4>Coralie</h4>
         <p>Monitrice indépendante</p>
       </div>
       <div class="team-card">
-        <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_350,h_467/https://poneyclubduvoulgis.com/wp-content/uploads/2020/06/sandra.jpg" alt="Sandra">
+        <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_350,h_467/https://poneyclubduvoulgis.com/wp-content/uploads/2020/06/sandra.jpg" alt="Sandra" loading="lazy" decoding="async" class="fade-img">
         <h4>Sandra</h4>
         <p>Monitrice indépendante</p>
       </div>
@@ -906,17 +971,17 @@
       <h2 style="font-size:1.6rem;">Un club reconnu et labellisé</h2>
     </div>
     <div class="badges-row">
-      <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_150,h_150/https://poneyclubduvoulgis.com/wp-content/uploads/2018/05/ecoleequitation-150x150.jpg" alt="École française d'équitation">
-      <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_150,h_150/https://poneyclubduvoulgis.com/wp-content/uploads/2018/05/chevalclubfrance-150x150.jpg" alt="Cheval Club de France">
-      <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_150,h_150/https://poneyclubduvoulgis.com/wp-content/uploads/2018/05/ffe-150x150.jpg" alt="Fédération Française d'Équitation">
-      <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_150,h_150/https://poneyclubduvoulgis.com/wp-content/uploads/2018/05/poneyclubfrance-150x150.jpg" alt="Poney Club de France">
+      <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_150,h_150/https://poneyclubduvoulgis.com/wp-content/uploads/2018/05/ecoleequitation-150x150.jpg" alt="École française d'équitation" loading="lazy" decoding="async" class="fade-img">
+      <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_150,h_150/https://poneyclubduvoulgis.com/wp-content/uploads/2018/05/chevalclubfrance-150x150.jpg" alt="Cheval Club de France" loading="lazy" decoding="async" class="fade-img">
+      <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_150,h_150/https://poneyclubduvoulgis.com/wp-content/uploads/2018/05/ffe-150x150.jpg" alt="Fédération Française d'Équitation" loading="lazy" decoding="async" class="fade-img">
+      <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_150,h_150/https://poneyclubduvoulgis.com/wp-content/uploads/2018/05/poneyclubfrance-150x150.jpg" alt="Poney Club de France" loading="lazy" decoding="async" class="fade-img">
     </div>
     <div class="section-head" style="margin:44px 0 24px;">
       <span class="eyebrow">Partenaires</span>
     </div>
     <div class="badges-row partners">
-      <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_200,h_200/https://poneyclubduvoulgis.com/wp-content/uploads/2020/08/logo-association-les-cavaliers-du-voulgis.jpg" alt="Association Les Cavaliers du Voulgis">
-      <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_200,h_200/https://poneyclubduvoulgis.com/wp-content/uploads/2020/09/photo-voglia.jpg" alt="Voglia Photos">
+      <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_200,h_200/https://poneyclubduvoulgis.com/wp-content/uploads/2020/08/logo-association-les-cavaliers-du-voulgis.jpg" alt="Association Les Cavaliers du Voulgis" loading="lazy" decoding="async" class="fade-img">
+      <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img,w_200,h_200/https://poneyclubduvoulgis.com/wp-content/uploads/2020/09/photo-voglia.jpg" alt="Voglia Photos" loading="lazy" decoding="async" class="fade-img">
     </div>
   </div>
 </section>
@@ -1143,16 +1208,23 @@
 }
 </script>
 
+<button id="back-to-top" aria-label="Retour en haut de page">
+  <svg viewBox="0 0 24 24" fill="none"><path d="M12 19V5M12 5L5 12M12 5l7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
+
 <div id="chatbot">
   <div id="chat-window">
     <div class="chat-head">
-      <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img/https://poneyclubduvoulgis.com/wp-content/uploads/2018/08/test2-150.png" alt="">
+      <img src="https://sp-ao.shortpixel.ai/client/to_webp,q_glossy,ret_img/https://poneyclubduvoulgis.com/wp-content/uploads/2018/08/test2-150.png" alt="" loading="lazy" decoding="async">
       <div class="ch-text">
         <strong>Assistant du club</strong>
         <span>En ligne</span>
       </div>
+      <a href="tel:+33164076263" class="chat-call-btn" aria-label="Appeler le club">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.4 0 .8-.2 1L6.6 10.8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      </a>
     </div>
-    <div id="chat-body"></div>
+    <div id="chat-body" aria-live="polite"></div>
     <div id="chat-suggestions"></div>
     <form id="chat-form" autocomplete="off">
       <input type="text" id="chat-input" placeholder="Posez votre question…" aria-label="Votre question">
@@ -1167,6 +1239,98 @@
     <span class="ping"></span>
   </button>
 </div>
+
+<script>
+(function(){
+  // Charge les diapositives du héro non visibles seulement après le chargement initial,
+  // pour laisser la première image (celle vue immédiatement) se charger sans concurrence.
+  function loadDeferredHeroSlides(){
+    document.querySelectorAll('.hero-slide[data-bg]').forEach(function(el){
+      el.style.backgroundImage = "url('" + el.getAttribute('data-bg') + "')";
+      el.removeAttribute('data-bg');
+    });
+  }
+  if (document.readyState === 'complete'){
+    loadDeferredHeroSlides();
+  } else {
+    window.addEventListener('load', loadDeferredHeroSlides);
+  }
+
+  // Fondu d'apparition des images une fois réellement chargées (moins de "pop" brutal)
+  function markLoaded(img){ img.classList.add('is-loaded'); }
+  document.querySelectorAll('img.fade-img').forEach(function(img){
+    if (img.complete && img.naturalWidth > 0){
+      markLoaded(img);
+    } else {
+      img.addEventListener('load', function(){ markLoaded(img); });
+      img.addEventListener('error', function(){ markLoaded(img); });
+    }
+  });
+})();
+</script>
+
+<script>
+(function(){
+  var menuToggle = document.getElementById('menu-toggle');
+  var navLinks = document.querySelector('nav.links');
+
+  function closeMenu(){
+    menuToggle.checked = false;
+    document.body.style.overflow = '';
+  }
+
+  menuToggle.addEventListener('change', function(){
+    document.body.style.overflow = menuToggle.checked ? 'hidden' : '';
+  });
+
+  navLinks.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){ closeMenu(); });
+  });
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') closeMenu();
+  });
+
+  window.addEventListener('resize', function(){
+    if (window.innerWidth > 980) closeMenu();
+  });
+
+  // Bouton retour en haut
+  var backToTop = document.getElementById('back-to-top');
+  window.addEventListener('scroll', function(){
+    backToTop.classList.toggle('show', window.scrollY > 500);
+  }, { passive: true });
+  backToTop.addEventListener('click', function(){
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // En-tête intelligent : se masque en descendant, réapparaît dès qu'on remonte,
+  // comme sur un site professionnel. Toujours visible tout en haut ou menu ouvert.
+  var header = document.querySelector('header');
+  var lastScrollY = window.scrollY;
+  var ticking = false;
+
+  function updateHeader(){
+    var current = window.scrollY;
+    if (menuToggle.checked || current <= 60){
+      header.classList.remove('header-hidden');
+    } else if (current > lastScrollY + 4){
+      header.classList.add('header-hidden');
+    } else if (current < lastScrollY - 4){
+      header.classList.remove('header-hidden');
+    }
+    lastScrollY = current;
+    ticking = false;
+  }
+
+  window.addEventListener('scroll', function(){
+    if (!ticking){
+      window.requestAnimationFrame(updateHeader);
+      ticking = true;
+    }
+  }, { passive: true });
+})();
+</script>
 
 <script>
 (function(){
@@ -1222,45 +1386,117 @@
   var suggWrap = document.getElementById('chat-suggestions');
   var opened = false;
 
-  // Base de connaissances du club
+  // Base de connaissances du club : chaque sujet propose sa propre réponse
+  // et des suggestions de suivi pertinentes, pour guider la conversation.
   var KB = [
-    { keys:['horaire','ouvert','ouverture','ferme','quand'],
-      answer:"Nous sommes ouverts du lundi au samedi de 8h à 12h et de 14h à 18h. Le dimanche, selon les animations, de 9h à 12h et de 14h à 17h." },
-    { keys:['tarif','prix','coute','cout','combien'],
-      answer:"Nos forfaits annuels débutent à 533€ (1h/semaine, Babies) et les cartes de 10 séances à partir de 239€. Retrouvez le détail complet dans la section « Tarifs » de la page, ou sur <a href='#tarifs'>notre grille tarifaire</a>." },
-    { keys:['adresse','ou','localis','trouve','venir','adress'],
-      answer:"Nous sommes situés Rue de Jamard, 77390 Ozouer-le-Voulgis. Une carte est disponible dans la section <a href='#contact'>Contact</a>." },
-    { keys:['telephone','appel','numero','contact','joindre'],
-      answer:"Vous pouvez nous joindre au 01 64 07 62 63 ou sur le portable au 06 85 31 54 58." },
-    { keys:['bapteme','2 ans','debutant','decouverte poney'],
-      answer:"Le baptême poney est ouvert dès 2 ans : 10€ les 15 minutes, 20€ les 30 minutes (+5€ pour les grands poneys). Une belle première rencontre avec le monde équestre !" },
-    { keys:['anniversaire'],
-      answer:"L'anniversaire poney se déroule les dimanches sur réservation : 150€ pour un forfait jusqu'à 8 enfants, 20€ par enfant supplémentaire." },
-    { keys:['stage','vacances'],
-      answer:"Nos stages ont lieu pendant les vacances scolaires, du lundi au vendredi de 9h à 17h. Comptez 60€ la journée pour les adhérents, ou 240€ la semaine (1 journée offerte)." },
-    { keys:['cours','lecon','apprendre','debuter','niveau'],
-      answer:"Nos cours suivent un parcours progressif : Babies, Découverte, Loisirs, School/Adultes puis Perfectionnement. Les forfaits annuels vont de 533€ à 933€ selon le niveau et le volume horaire." },
-    { keys:['pension','proprietaire','box','demi-pension','demi pension'],
-      answer:"Nous proposons des pensions et demi-pensions pour shetlands, poneys et chevaux, à partir de 149€/mois. Voir la page « Pensions » pour plus de détails." },
-    { keys:['equipe','moniteur','qui', 'professeur'],
-      answer:"Notre équipe est composée de Renaud Vermes (directeur), Anaïs, Maxime, Emma, Coralie et Sandra — tous passionnés et à votre écoute. Voir la section <a href='#equipe'>L'équipe</a>." },
-    { keys:['licence', 'ffe', 'adhesion'],
-      answer:"La licence FFE est obligatoire : 25€ pour les enfants, 36€ pour les adultes. L'adhésion au club est de 50€ (enfants) ou 80€ (adultes)." },
-    { keys:['installation','manege','carriere','box','infrastructure'],
-      answer:"Le club dispose d'un grand manège 20x40, d'une carrière 35x80, d'un petit manège, d'un marcheur et de stabulations. Voir la section <a href='#installations'>Installations</a>." },
-    { keys:['inscription','inscrire','espace membre','reserver'],
-      answer:"Les inscriptions et réservations se font via notre espace membre en ligne : <a href='https://cloud2.kavalog.fr/VOULGIS/' target='_blank' rel='noopener'>cliquez ici</a>. Un code d'accès vous sera fourni sur demande." },
-    { keys:['evenement','competition','concours','calendrier'],
-      answer:"Retrouvez tous nos évènements, stages et compétitions à venir dans la section <a href='#evenements'>Évènements</a> de la page." },
-    { keys:['bonjour','salut','coucou','bonsoir','hello'],
-      answer:"Bonjour ! Ravi de vous accueillir au Poney Club du Voulgis 🐴 Que puis-je faire pour vous aujourd'hui ?" },
-    { keys:['merci'],
-      answer:"Avec plaisir ! N'hésitez pas si vous avez d'autres questions." }
+    { id:'horaires', keys:['horaire','ouvert','ouverture','ferme','quand ouvre','quand'],
+      answer:"Nous sommes ouverts du lundi au samedi de 8h à 12h et de 14h à 18h. Le dimanche, selon les animations, de 9h à 12h et de 14h à 17h.",
+      related:['Adresse du club','Appeler le club','Tarifs des cours'] },
+    { id:'tarifs', keys:['tarif','prix','coute','cout','combien'],
+      answer:"Nos forfaits annuels débutent à 533€ (1h/semaine, Babies) et les cartes de 10 séances à partir de 239€. Retrouvez le détail complet dans la section « Tarifs » de la page, ou sur <a href='#tarifs'>notre grille tarifaire</a>.",
+      related:['Licence FFE','Pensions','Cours particuliers'] },
+    { id:'adresse', keys:['adresse','ou','localis','trouve','venir','adress','acces','parking','garer'],
+      answer:"Nous sommes situés Rue de Jamard, 77390 Ozouer-le-Voulgis. Un parking est disponible sur place. Une carte est intégrée dans la section <a href='#contact'>Contact</a>.",
+      related:['Itinéraire','Horaires d\u2019ouverture','Appeler le club'] },
+    { id:'telephone', keys:['telephone','appel','numero','joindre'],
+      answer:"Vous pouvez nous joindre au <a href='tel:+33164076263'>01 64 07 62 63</a> ou sur le portable au <a href='tel:+33685315458'>06 85 31 54 58</a>.",
+      related:['Horaires d\u2019ouverture','Adresse du club'] },
+    { id:'bapteme', keys:['bapteme','2 ans','decouverte poney'],
+      answer:"Le baptême poney est ouvert dès 2 ans : 10€ les 15 minutes, 20€ les 30 minutes (+5€ pour les grands poneys). Une belle première rencontre avec le monde équestre !",
+      related:['Anniversaire poney','Réserver un créneau','Tarifs des cours'] },
+    { id:'anniversaire', keys:['anniversaire'],
+      answer:"L'anniversaire poney se déroule les dimanches sur réservation : 150€ pour un forfait jusqu'à 8 enfants, 20€ par enfant supplémentaire.",
+      related:['Baptême poney','Appeler le club'] },
+    { id:'stages', keys:['stage','vacances scolaires','vacances'],
+      answer:"Nos stages ont lieu pendant les vacances scolaires, du lundi au vendredi de 9h à 17h. Comptez 60€ la journée pour les adhérents, ou 240€ la semaine (1 journée offerte).",
+      related:['Garderie','Colonie d\u2019équitation','Tarifs des cours'] },
+    { id:'garderie', keys:['garderie'],
+      answer:"Une option garderie est disponible en dehors des horaires du stage, à 5€ la demi-heure.",
+      related:['Stages vacances scolaires'] },
+    { id:'cours', keys:['cours','lecon','apprendre','debuter','niveau','debutant'],
+      answer:"Nos cours suivent un parcours progressif : Babies, Découverte, Loisirs, School/Adultes puis Perfectionnement. Les forfaits annuels vont de 533€ à 933€ selon le niveau et le volume horaire.",
+      related:['Cours particuliers','Licence FFE','Tarifs des cours'] },
+    { id:'particulier', keys:['particulier','privilege','individuel'],
+      answer:"Les cours particuliers sont à 65€ l'heure (1 personne). Les formules Privilège (jusqu'à 3 personnes) sont à 35€/pers la demi-heure ou 55€/pers l'heure.",
+      related:['Tarifs des cours'] },
+    { id:'pensions', keys:['pension','proprietaire','box','demi-pension','demi pension'],
+      answer:"Nous proposons deux formules de pension pour poneys et chevaux : Pension de base (dès 399€/mois) et Pension VIP (dès 599€/mois), avec accès complet à toutes nos installations. Voir la section <a href='#pensions'>Pensions</a>.",
+      related:['Installations','Appeler le club'] },
+    { id:'equipe', keys:['equipe','moniteur','qui travaille','professeur','encadrement'],
+      answer:"Notre équipe est composée de Renaud Vermes (directeur), Anaïs, Maxime, Emma, Coralie et Sandra — tous passionnés et à votre écoute. Voir la section <a href='#equipe'>L'équipe</a>.",
+      related:['Cours','Avis clients'] },
+    { id:'licence', keys:['licence', 'ffe', 'adhesion'],
+      answer:"La licence FFE est obligatoire : 25€ pour les enfants, 36€ pour les adultes. L'adhésion au club est de 50€ (enfants) ou 80€ (adultes).",
+      related:['Tarifs des cours','Inscription'] },
+    { id:'installations', keys:['installation','manege','carriere','box','infrastructure','equipement'],
+      answer:"Le club dispose d'un grand manège 20x40, d'une carrière 35x80, d'un petit manège, d'un marcheur et de stabulations. Voir la section <a href='#installations'>Installations</a>.",
+      related:['Pensions','Galerie photos'] },
+    { id:'galerie', keys:['photo','galerie','image'],
+      answer:"Vous pouvez découvrir nos poneys, nos installations et l'ambiance du club en images dans la section <a href='#installations'>Installations</a> et sur notre <a href='https://www.facebook.com/PoneyClubduVoulgis/' target='_blank' rel='noopener'>page Facebook</a>.",
+      related:['Installations','Avis clients'] },
+    { id:'inscription', keys:['inscription','inscrire','espace membre','reserver','payer en ligne'],
+      answer:"Les inscriptions et réservations se font via notre espace membre en ligne : <a href='https://cloud2.kavalog.fr/VOULGIS/' target='_blank' rel='noopener'>cliquez ici</a>. Un code d'accès vous sera fourni sur demande.",
+      related:['Tarifs des cours','Appeler le club'] },
+    { id:'evenements', keys:['evenement','competition','concours','calendrier'],
+      answer:"Retrouvez tous nos évènements, stages et compétitions à venir dans la section <a href='#evenements'>Évènements</a> de la page.",
+      related:['Stages vacances scolaires','Avis clients'] },
+    { id:'avis', keys:['avis','note','recommand'],
+      answer:"Le club est noté 4,7/5 par nos familles et cavaliers ! Retrouvez leurs témoignages dans la section <a href='#avis'>Avis clients</a>.",
+      related:['L\u2019équipe','Contact'] },
+    { id:'age', keys:['age minimum','quel age','a partir de quel age'],
+      answer:"Nous accueillons les cavaliers dès 2 ans (baptême et cours Babies), et ce jusqu'à la compétition, sans limite d'âge maximum.",
+      related:['Baptême poney','Cours'] },
+    { id:'materiel', keys:['materiel','bombe','casque','tenue','equipement cavalier'],
+      answer:"Pour les cours, prévoyez une tenue confortable et des chaussures fermées à petit talon. Le casque (bombe) est fourni par le club si besoin pour les premiers cours.",
+      related:['Cours'] },
+    { id:'poneys-chevaux', keys:['cheval','chevaux','poneys','shetland'],
+      answer:"Le club accueille toute une cavalerie adaptée à chaque niveau : shetlands pour les plus jeunes, poneys et grands chevaux pour les cavaliers confirmés.",
+      related:['Installations','Pensions'] },
+    { id:'salut', keys:['bonjour','salut','coucou','bonsoir','hello'],
+      answer:"Bonjour ! Ravi de vous accueillir au Poney Club du Voulgis 🐴 Que puis-je faire pour vous aujourd'hui ?",
+      related:['Horaires d\u2019ouverture','Tarifs des cours','Baptême poney'] },
+    { id:'merci', keys:['merci'],
+      answer:"Avec plaisir ! N'hésitez pas si vous avez d'autres questions.",
+      related:['Horaires d\u2019ouverture','Adresse du club','Appeler le club'] },
+    { id:'duree_cours', keys:['duree','combien de temps dure','longtemps'],
+      answer:"La durée dépend du niveau : 30 minutes pour les Babies, 1h pour Découverte/Loisirs, 1h15 pour School/Adultes, et 1h30 pour le Perfectionnement.",
+      related:['Cours','Tarifs des cours'] },
+    { id:'essai', keys:['essai','essayer','decouvrir avant','sans engagement','tester'],
+      answer:"Bien sûr ! Vous pouvez essayer l'équitation sans engagement grâce à l'offre 3 séances pour 50€, ou profiter d'une initiation gratuite lors de nos Dimanches à Poney. Voir la section <a href='#activites'>Activités</a>.",
+      related:['Baptême poney','Tarifs des cours'] },
+    { id:'debutant_total', keys:['jamais monte','premiere fois','debutant complet','aucune experience'],
+      answer:"Aucun souci, la majorité de nos cavaliers débutent à zéro ! Les cours Découverte sont justement pensés pour une première année, en douceur et en petit groupe.",
+      related:['Cours','Baptême poney'] },
+    { id:'paiement', keys:['paiement','payer','moyen de paiement','cheque','carte bancaire','especes','ancv'],
+      answer:"Le règlement peut se faire par carte bancaire, chèque, espèces ou chèques vacances (ANCV). Les inscriptions et paiements en ligne sont aussi possibles via notre <a href='https://cloud2.kavalog.fr/VOULGIS/' target='_blank' rel='noopener'>espace membre</a>.",
+      related:['Tarifs des cours','Inscription'] },
+    { id:'annulation', keys:['annulation','rembours','absence','rattrapage','desistement'],
+      answer:"Les forfaits ne sont pas remboursables en cas de désistement, sauf assurance annulation souscrite. Les cours non pris peuvent être rattrapés dans l'année (6 séances maximum), en signalant votre absence au moins une semaine à l'avance. Détails dans notre <a data-modal-trigger='reglement'>règlement intérieur</a>.",
+      related:['Tarifs des cours'] },
+    { id:'handicap', keys:['handicap','pmr','adapte','situation de handicap'],
+      answer:"Le club accueille les publics en situation de handicap avec des séances adaptées et encadrées. Voir la section <a href='#activites'>Groupes & prestations</a> ou contactez-nous pour en discuter.",
+      related:['Appeler le club'] },
+    { id:'scolaire_ce', keys:['scolaire','classe','ecole','comite d\u2019entreprise','ce ','centre aere','centre de loisirs'],
+      answer:"Nous accueillons aussi les groupes scolaires, centres de loisirs et comités d'entreprise pour des animations équestres sur mesure. Voir la section <a href='#activites'>Groupes & prestations</a>.",
+      related:['Appeler le club'] },
+    { id:'attelage', keys:['attelage','caleche','calèche','balade en caleche'],
+      answer:"Nous proposons aussi des balades en calèche et initiations à l'attelage, pour découvrir le cheval autrement. Voir la section <a href='#activites'>Activités</a>.",
+      related:['Appeler le club'] },
+    { id:'reglement', keys:['reglement interieur','regles du club'],
+      answer:"Vous pouvez consulter l'intégralité de notre règlement intérieur directement sur le site.",
+      related:['Tarifs des cours'] }
   ];
 
-  var FALLBACK = "Je n'ai pas la réponse exacte à cette question. Le plus simple est de nous appeler au <a href='tel:+33164076263'>01 64 07 62 63</a> ou de nous écrire via la section <a href='#contact'>Contact</a>.";
+  // Actions rapides toujours accessibles, quel que soit le sujet
+  var QUICK_ACTIONS = {
+    'Appeler le club': "Vous pouvez nous joindre directement au <a href='tel:+33164076263'>01 64 07 62 63</a>.",
+    'Itinéraire': "Voici notre adresse : Rue de Jamard, 77390 Ozouer-le-Voulgis. <a href='https://www.google.com/maps?q=Rue+de+Jamard,+77390+Ozouer-le-Voulgis' target='_blank' rel='noopener'>Ouvrir l'itinéraire</a>."
+  };
 
-  var SUGGESTIONS = ["Horaires d'ouverture","Tarifs des cours","Baptême poney","Adresse du club"];
+  var FALLBACK = "Je n'ai pas la réponse exacte à cette question. Le plus simple est de nous appeler au <a href='tel:+33164076263'>01 64 07 62 63</a> ou de nous écrire via la section <a href='#contact'>Contact</a>.";
+  var FALLBACK_RELATED = ["Horaires d\u2019ouverture","Tarifs des cours","Appeler le club"];
+
+  var DEFAULT_SUGGESTIONS = ["Horaires d'ouverture","Tarifs des cours","Baptême poney","Adresse du club"];
 
   function normalize(s){
     return s.toLowerCase()
@@ -1268,20 +1504,20 @@
       .replace(/[^a-z0-9 ]/g,' ');
   }
 
-  function findAnswer(text){
+  function findEntry(text){
     var t = normalize(text);
     for (var i=0;i<KB.length;i++){
       for (var j=0;j<KB[i].keys.length;j++){
-        if (t.indexOf(KB[i].keys[j]) !== -1) return KB[i].answer;
+        if (t.indexOf(KB[i].keys[j]) !== -1) return KB[i];
       }
     }
-    return FALLBACK;
+    return null;
   }
 
-  function addMsg(text, who){
+  function addMsg(html, who){
     var el = document.createElement('div');
     el.className = 'msg ' + who;
-    el.innerHTML = text;
+    el.innerHTML = html;
     body.appendChild(el);
     body.scrollTop = body.scrollHeight;
   }
@@ -1295,12 +1531,12 @@
     setTimeout(function(){
       el.remove();
       cb();
-    }, 600 + Math.random()*400);
+    }, 500 + Math.random()*350);
   }
 
-  function renderSuggestions(){
+  function renderSuggestions(list){
     suggWrap.innerHTML = '';
-    SUGGESTIONS.forEach(function(s){
+    list.forEach(function(s){
       var b = document.createElement('button');
       b.type = 'button';
       b.className = 'sugg-btn';
@@ -1315,18 +1551,41 @@
     addMsg(text, 'user');
     input.value = '';
     showTyping(function(){
-      addMsg(findAnswer(text), 'bot');
+      var norm = normalize(text);
+      // Actions rapides (appel, itinéraire) reconnues même via les chips
+      var quickKey = Object.keys(QUICK_ACTIONS).find(function(k){ return normalize(k) === norm; });
+      if (quickKey){
+        addMsg(QUICK_ACTIONS[quickKey], 'bot');
+        renderSuggestions(DEFAULT_SUGGESTIONS);
+        return;
+      }
+      var entry = findEntry(text);
+      if (entry){
+        addMsg(entry.answer, 'bot');
+        renderSuggestions(entry.related || DEFAULT_SUGGESTIONS);
+      } else {
+        addMsg(FALLBACK, 'bot');
+        renderSuggestions(FALLBACK_RELATED);
+      }
     });
+  }
+
+  function markSeen(){
+    root.classList.add('seen');
   }
 
   toggle.addEventListener('click', function(){
     opened = !opened;
     root.classList.toggle('open', opened);
-    if (opened && body.children.length === 0){
-      showTyping(function(){
-        addMsg("Bonjour et bienvenue au Poney Club du Voulgis 🐴<br>Je suis là pour répondre à vos questions sur les cours, tarifs, stages, ou horaires. Que souhaitez-vous savoir ?", 'bot');
-      });
-      renderSuggestions();
+    if (opened){
+      markSeen();
+      if (body.children.length === 0){
+        showTyping(function(){
+          addMsg("Bonjour et bienvenue au Poney Club du Voulgis 🐴<br>Je suis là pour répondre à vos questions sur les cours, tarifs, stages, pensions ou horaires. Que souhaitez-vous savoir ?", 'bot');
+        });
+        renderSuggestions(DEFAULT_SUGGESTIONS);
+      }
+      setTimeout(function(){ input.focus({preventScroll:true}); }, 260);
     }
   });
 
